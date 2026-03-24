@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "external_id": {
+      "type": "string",
+      "minLength": 1,
+      "x-unique": true
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "email": {
+      "type": "string",
+      "minLength": 3
+    },
+    "bio": {
+      "type": ["string", "null"]
+    }
+  },
+  "required": ["external_id", "name", "email"],
+  "additionalProperties": false
+}

@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: korpus
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d korpus"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  korpus:
+    image: golang:1.25
+    working_dir: /app
+    command: sh -c "go run ."
+    volumes:
+      - ..:/app
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/korpus?sslmode=disable
+      REDIS_ADDR: redis:6379
+      HTTP_PORT: "4222"
+      AUTH_TOKEN: dev-token
+      SCHEMA_DIR: /app/examples/extensions
+    ports:
+      - "4222:4222"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
